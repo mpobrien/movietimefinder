@@ -1,7 +1,12 @@
+from datetime import datetime
 import sys
 import requests
+from pymongo import MongoClient
 from pyquery import PyQuery as pq;
 from collections import namedtuple, OrderedDict
+import argparse
+
+db = MongoClient().movies
 
 
 Theater = namedtuple('Theater', ['name', 'url'])
@@ -25,7 +30,7 @@ def extract_movietimes(theaterpage_content):
 
     return retval
 
-def get_theaters(body):
+def parse_theaters(body):
     page = pq(body)
     theater_as = page.find('a')
     urls = []
@@ -35,18 +40,31 @@ def get_theaters(body):
 
     return urls
 
-
-def main(args):
-    if len(args) > 0:
-        theaters_list = open(args[0],'r').read()
-        theaters = get_theaters(theaters_list)
-        test = theaters[230]
-        print test
-        th_data = get_theater_data(test.url, '5/23/13')
-        times = extract_movietimes(th_data)
-        for k,v, in times.items():
-            print k, v
-
-
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    parser = argparse.ArgumentParser(description="Movie Time Scraper")
+    parser.add_argument("-r", dest="theatersfile", help="update theater info from .html file")
+    parser.add_argument("-d", dest="date", help="select a date to get movie times for (M/D/YY)")
+    parser.add_argument("-s", dest="sync", action="store_true", default=None, help="resync showtimes for theaters")
+    results = parser.parse_args()
+
+    theaters_to_use = []
+    if results.theatersfile:
+        for theater in parse_theaters(open(results.theatersfile,'r').read()):
+            db.theaters.update({"_id":theater.name},{"$set":{"url":theater.url}}, upsert=True)
+            theaters_to_use.append(theater.name)
+
+    querydate = datetime.now().strftime('%m/%d/%y')
+    if results.date:
+        querydate = results.date
+    store_date = datetime.strptime(querydate,'%m/%d/%y')
+
+    if results.sync:
+        if not theaters_to_use:
+            theaters_to_use = [Theater(x['_id'],x['url']) for x in  list(db.theaters.find({}))]
+        for theater in theaters_to_use:
+            theater_data = get_theater_data(theater.url, querydate)
+            times = extract_movietimes(theater_data)
+            print times
+            db.showtimes.update({'_id' : theater.name + '|' + querydate}, {"$set":{'movies':times, '_date':store_date}}, upsert=True)
+
+
