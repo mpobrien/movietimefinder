@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% from "_formhelpers.html" import render_field %}
+
+<form action="{{url_for('usermgmt.forgot')}}" method="POST">
+    <dl>
+        {{render_field(form.email)}}
+        <input type="submit"/>
+    </dl>
+</form>
+{% endblock %}

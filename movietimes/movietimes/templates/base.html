@@ -1,0 +1,35 @@
+<html>
+    <head>
+    {% block head %}
+        <title>{% block title %}{% endblock %}</title>
+        <script src="/static/js/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="/static/bootstrap/js/bootstrap.min.js"></script>
+        {%- if config.DEBUG %}
+            <link href="/static/main.less" rel="stylesheet/less" type="text/css"/>
+            {% if config.CSS_FRAMEWORK == 'bootstrap' -%}
+            <link href="/static/bootstrap/less/bootstrap.less" rel="stylesheet/less" type="text/css"/>
+            {%- elif config.CSS_FRAMEWORK == 'foundation' -%}
+            <link href="/static/foundation/stylesheets/foundation.css" rel="stylesheet/css" type="text/css"/>
+            {%- endif %}
+            <script src="/static/js/less-1.3.3.min.js"></script>
+        {% else %}
+            <link href="/static/main.css" rel="stylesheet" type="text/css"/>
+            {% if config.CSS_FRAMEWORK == 'bootstrap' %}
+            <link href="/static/bootstrap/less/bootstrap.css" rel="stylesheet" type="text/css"/>
+            {% elif config.CSS_FRAMEWORK == 'foundation' %}
+            <link href="/static/foundation/stylesheets/foundation.css" rel="stylesheet/css" type="text/css"/>
+            {% endif %}
+        {% endif %}
+    {% endblock %}
+    </head>
+    <body>
+        <div id="content">
+            {% block messages %}
+                {% from "_formhelpers.html" import show_messages %}
+                {{ show_messages() }}
+            {% endblock %}
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+</html>

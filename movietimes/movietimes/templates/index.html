@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  <table cellspacing="0">
+    {% for theater in theaters %}
+      <h3> {{theater._id}} </h3>
+    {% endfor %}
+
+  </table>
+{% endblock %}

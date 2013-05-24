@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+  <table cellspacing="0">
+    {% for name, info in theaters.items() %}
+      <h3>{{name}}</h3>
+      <table cellspacing="0" cellpadding="3" class="movietimes">
+      {% for movie, times in info.times.movies.items() %}
+        <tr {{ 'class="highlight"'|safe if loop.index % 2 else '' }}>
+          <th>
+            {{movie}}
+          </th>
+          {% for time in times %}
+            <td>
+              {{time}}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </table>
+    {% endfor %}
+  </table>
+{% endblock %}
