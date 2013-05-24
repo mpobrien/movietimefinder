@@ -65,6 +65,6 @@ if __name__ == '__main__':
             theater_data = get_theater_data(theater.url, querydate)
             times = extract_movietimes(theater_data)
             print times
-            db.showtimes.update({'_id' : theater.name + '|' + querydate}, {"$set":{'movies':times, '_date':store_date}}, upsert=True)
+            db.showtimes.update({'_id' : theater.name + '|' + querydate}, {"$set":{'movies':times, '_date':store_date, '_theater':theater.name}}, upsert=True)
 
 
